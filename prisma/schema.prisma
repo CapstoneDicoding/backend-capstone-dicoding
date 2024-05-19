@@ -23,4 +23,17 @@ model Companies {
   description String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
+  Jobs        Jobs[]
+}
+
+model Jobs {
+  id               Int       @id @default(autoincrement())
+  name             String
+  business_sector  String
+  requirements     String
+  candidate_needed Int
+  company          Companies @relation(fields: [company_id], references: [id])
+  company_id       Int
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime? @updatedAt
 }
