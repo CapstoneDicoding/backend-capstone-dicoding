@@ -7,18 +7,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum cv_status {
+enum CV_status {
   accepted
   denied
-  queueing
+  queuing
+}
+
+enum Roles {
+  candidate
+  recruiter
+}
+
+model Users {
+  id         Int          @id @default(autoincrement())
+  username   String       @unique
+  password   String       @db.VarChar(255)
+  fullname   String
+  photo_path String
+  role       Roles
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime?    @updatedAt
+  candidates Candidates[]
+  companies  Companies[]
 }
 
 model Candidates {
   id                Int                 @id @default(autoincrement())
-  username          String              @unique
-  password          String              @db.VarChar(255)
-  fullname          String
-  photo_path        String
+  user_id           Int
+  user              Users               @relation(fields: [user_id], references: [id])
   email             String
   notelp            String
   skills            Json
@@ -29,10 +45,8 @@ model Candidates {
 
 model Companies {
   id          Int       @id @default(autoincrement())
-  username    String    @unique
-  password    String    @db.VarChar(255)
-  fullname    String
-  photo_path  String
+  user_id     Int
+  user        Users     @relation(fields: [user_id], references: [id])
   location    String
   description String
   createdAt   DateTime  @default(now())
@@ -58,7 +72,7 @@ model Curriculum_vitaes {
   original_cv_path   String
   summarized_cv_path String
   accuracy           Int
-  status             cv_status
+  status             CV_status
   candidate          Candidates @relation(fields: [candidate_id], references: [id])
   candidate_id       Int
   job                Jobs       @relation(fields: [job_id], references: [id])

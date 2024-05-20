@@ -1,14 +1,32 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  NotFoundException,
+  BadRequestException,
+  UseGuards,
+} from '@nestjs/common';
 import { CurriculumVitaesService } from './curriculum_vitaes.service';
 import { CreateCurriculumVitaeDto } from './dto/create-curriculum_vitae.dto';
 import { UpdateCurriculumVitaeDto } from './dto/update-curriculum_vitae.dto';
 import { cv_status } from './entities/curriculum_vitae.entity';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Role, Roles } from 'src/auth/roles.decorator';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('cvs')
 export class CurriculumVitaesController {
-  constructor(private readonly curriculumVitaesService: CurriculumVitaesService) {}
+  constructor(
+    private readonly curriculumVitaesService: CurriculumVitaesService,
+  ) {}
 
+  @Roles(Role.candidate)
   @Post()
   async create(@Body() data: CreateCurriculumVitaeDto) {
     try {
@@ -16,18 +34,18 @@ export class CurriculumVitaesController {
       const candidate_id = 1;
       const summarized_cv_path = 'tes';
       const accuracy = 100;
-      const status = cv_status.queueing;
-  
+      const status = cv_status.queuing;
+
       const cvData = {
         ...data,
         candidate_id,
         summarized_cv_path,
         accuracy,
         status,
-      }
-  
+      };
+
       await this.curriculumVitaesService.create(cvData);
-  
+
       return {
         message: 'CV berhasil ditambah',
       };
@@ -40,6 +58,7 @@ export class CurriculumVitaesController {
     }
   }
 
+  @Roles(Role.recruiter)
   @Get()
   async getAll() {
     const cvs = await this.curriculumVitaesService.findAll();
@@ -73,7 +92,10 @@ export class CurriculumVitaesController {
   }
 
   @Patch(':id')
-  async updateById(@Param('id') id: string, @Body() data: UpdateCurriculumVitaeDto) {
+  async updateById(
+    @Param('id') id: string,
+    @Body() data: UpdateCurriculumVitaeDto,
+  ) {
     try {
       await this.curriculumVitaesService.update(+id, data);
 
@@ -89,6 +111,7 @@ export class CurriculumVitaesController {
     }
   }
 
+  @Roles(Role.candidate)
   @Delete(':id')
   async deleteById(@Param('id') id: string) {
     try {

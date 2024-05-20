@@ -25,8 +25,6 @@ export class CurriculumVitaesService {
       include: {
         candidate: {
           select: {
-            fullname: true,
-            photo_path: true,
             email: true,
             notelp: true,
             skills: true,
