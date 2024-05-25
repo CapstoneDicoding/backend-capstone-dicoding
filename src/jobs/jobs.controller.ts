@@ -7,16 +7,22 @@ import {
   Param,
   Delete,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Role, Roles } from 'src/auth/roles.decorator';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('jobs')
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
+  @Roles(Role.recruiter)
   @Post()
   async create(@Body() data: CreateJobDto) {
     // TO BE DEVELOPED
@@ -61,6 +67,7 @@ export class JobsController {
     }
   }
 
+  @Roles(Role.recruiter)
   @Patch(':id')
   async updateById(@Param('id') id: string, @Body() data: UpdateJobDto) {
     try {
@@ -78,6 +85,7 @@ export class JobsController {
     }
   }
 
+  @Roles(Role.recruiter)
   @Delete(':id')
   async deleteById(@Param('id') id: string) {
     try {
