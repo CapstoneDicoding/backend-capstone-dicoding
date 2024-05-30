@@ -16,13 +16,82 @@ export class JobsService {
     });
   }
 
-  async findAll() {
-    return await this.dbService.jobs.findMany();
+  async findAll({ page, limit }) {
+    const skip = (page - 1) * limit;
+
+    const totalJobs = await this.dbService.jobs.count();
+    const totalPages = Math.ceil(totalJobs / limit);
+
+    const jobs = await this.dbService.jobs.findMany({
+      skip,
+      take: limit,
+      include: {
+        company: {
+          include: {
+            user: {
+              select: {
+                fullname: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return {
+      jobs, 
+      totalPages,
+    }
+  }
+
+  async findAllCompanyJobs({ page, limit, company_id }) {
+    const skip = (page - 1) * limit;
+
+    const totalJobs = await this.dbService.jobs.count();
+    const totalPages = Math.ceil(totalJobs / limit);
+
+    const jobs = await this.dbService.jobs.findMany({
+      where: { company_id },
+      skip,
+      take: limit,
+      include: {
+        company: {
+          include: {
+            user: {
+              select: {
+                fullname: true,
+              },
+            },
+          },
+        },
+        _count: {
+          select: {
+            curriculum_vitaes: true,
+          },
+        },
+      },
+    });
+
+    return {
+      jobs, 
+      totalPages,
+    }
   }
 
   async findById(id: number) {
     return await this.dbService.jobs.findUniqueOrThrow({
       where: { id },
+      include: {
+        company: {
+          include: {
+            user: {
+              select: {
+                fullname: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 
