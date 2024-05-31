@@ -33,6 +33,7 @@ export class CompaniesController {
     try {
       return await this.companiesService.create(data);
     } catch (error) {
+      console.log(error)
       if (error instanceof PrismaClientKnownRequestError) {
         throw new ConflictException();
       } else if (error instanceof PrismaClientValidationError) {

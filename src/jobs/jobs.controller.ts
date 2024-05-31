@@ -27,9 +27,10 @@ export class JobsController {
   @Roles(Role.recruiter)
   @Post()
   async create(@Request() req, @Body() data: CreateJobDto) {
+    const { company_id } = req.user
 
-    await this.jobsService.create(req.user.id, data);
-
+    await this.jobsService.create(data, company_id);
+    
     return {
       message: 'Lowongan pekerjaan berhasil dibuat',
     };

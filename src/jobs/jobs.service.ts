@@ -7,7 +7,7 @@ import { PrismaService } from 'src/prisma.service';
 export class JobsService {
   constructor(private dbService: PrismaService) {}
 
-  async create(company_id: number, jobData: CreateJobDto) {
+  async create(jobData: CreateJobDto, company_id: number) {
     return await this.dbService.jobs.create({
       data: {
         company_id,
@@ -39,9 +39,9 @@ export class JobsService {
     });
 
     return {
-      jobs, 
+      jobs,
       totalPages,
-    }
+    };
   }
 
   async findAllCompanyJobs({ page, limit, company_id }) {
@@ -73,9 +73,9 @@ export class JobsService {
     });
 
     return {
-      jobs, 
+      jobs,
       totalPages,
-    }
+    };
   }
 
   async findById(id: number) {
