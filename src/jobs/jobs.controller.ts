@@ -26,9 +26,8 @@ export class JobsController {
   @Post()
   async create(@Body() data: CreateJobDto) {
     // TO BE DEVELOPED
-    const company_id = 1;
 
-    await this.jobsService.create(data, company_id);
+    await this.jobsService.create(data);
 
     return {
       message: 'Lowongan pekerjaan berhasil dibuat',
