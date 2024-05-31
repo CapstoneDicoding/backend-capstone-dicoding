@@ -32,7 +32,7 @@ export class CurriculumVitaesController {
   async create(@Request() req: any, @Body() data: CreateCurriculumVitaeDto) {
     try {
       // TO BE DEVELOPED
-      const { candidate_id } = req.user
+      const { candidate_id } = req.user;
       const summarized_cv_path = 'tes';
       const accuracy = 100;
       const status = cv_status.queuing;
@@ -64,12 +64,7 @@ export class CurriculumVitaesController {
   async getAll() {
     const cvs = await this.curriculumVitaesService.findAll();
 
-    return {
-      message: 'CV berhasil ditampilkan',
-      data: {
-        cvs,
-      },
-    };
+    return cvs;
   }
 
   @Get(':id')
@@ -77,12 +72,7 @@ export class CurriculumVitaesController {
     try {
       const cv = await this.curriculumVitaesService.findById(+id);
 
-      return {
-        message: 'CV berhasil ditampilkan',
-        data: {
-          cv,
-        },
-      };
+      return cv;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
