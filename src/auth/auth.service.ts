@@ -16,6 +16,24 @@ export class AuthService {
     });
   }
 
+  async findCandidateIdByUserId(user_id: number) {
+    return await this.dbService.candidates.findFirst({
+      where: { user_id },
+      select: {
+        id: true,
+      },
+    });
+  }
+
+  async findCompanyIdByUserId(user_id: number) {
+    return await this.dbService.companies.findFirst({
+      where: { user_id },
+      select: {
+        id: true,
+      },
+    });
+  }
+
   async validateUser(username: string, password: string) {
     const user = await this.findByUsername(username);
     if (user && (await compare(password, user.password))) {
@@ -31,7 +49,16 @@ export class AuthService {
       fullname: user.fullname,
       role: user.role,
     };
+    
+    let extendedPayload = payload as any;
+    if (user.role === 'recruiter') {
+      const { id } = await this.findCompanyIdByUserId(user.id);
+      extendedPayload.company_id = id;
+    } else {
+      const { id } = await this.findCandidateIdByUserId(user.id);
+      extendedPayload.candidate_id = id;
+    }
 
-    return { access_token: this.jwtService.sign(payload), role: user.role };
+    return { access_token: this.jwtService.sign(extendedPayload), role: user.role};
   }
 }

@@ -9,6 +9,7 @@ import {
   Request,
   NotFoundException,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
@@ -35,13 +36,43 @@ export class JobsController {
   }
 
   @Get()
-  async getAll() {
-    const jobs = await this.jobsService.findAll();
+  async getAll(@Query('page') page: number, @Query('limit') limit: number) {
+    const { jobs, totalPages } = await this.jobsService.findAll({
+      page: +page || 10,
+      limit: +limit || 10,
+    });
 
     return {
       message: 'Lowongan pekerjaan berhasil ditampilkan',
       data: {
         jobs,
+        pagination: {
+          totalPages,
+        },
+      },
+    };
+  }
+
+  @Get('/company')
+  async getAllCompanyJobs(
+    @Request() req: any,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ) {
+    const { company_id } = req.user;
+    const { jobs, totalPages } = await this.jobsService.findAllCompanyJobs({
+      page: +page || 10,
+      limit: +limit || 10,
+      company_id,
+    });
+
+    return {
+      message: 'Lowongan pekerjaan berhasil ditampilkan',
+      data: {
+        jobs,
+        pagination: {
+          totalPages,
+        },
       },
     };
   }
