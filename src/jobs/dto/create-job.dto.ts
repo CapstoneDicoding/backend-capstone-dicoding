@@ -2,6 +2,10 @@ import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateJobDto {
   @IsNotEmpty()
+  @IsInt()
+  company_id: number
+
+  @IsNotEmpty()
   @IsString()
   name: string;
 
