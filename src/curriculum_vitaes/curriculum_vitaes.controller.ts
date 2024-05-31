@@ -9,6 +9,7 @@ import {
   NotFoundException,
   BadRequestException,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { CurriculumVitaesService } from './curriculum_vitaes.service';
 import { CreateCurriculumVitaeDto } from './dto/create-curriculum_vitae.dto';
@@ -28,10 +29,10 @@ export class CurriculumVitaesController {
 
   @Roles(Role.candidate)
   @Post()
-  async create(@Body() data: CreateCurriculumVitaeDto) {
+  async create(@Request() req: any, @Body() data: CreateCurriculumVitaeDto) {
     try {
       // TO BE DEVELOPED
-      const candidate_id = 1;
+      const { candidate_id } = req.user
       const summarized_cv_path = 'tes';
       const accuracy = 100;
       const status = cv_status.queuing;

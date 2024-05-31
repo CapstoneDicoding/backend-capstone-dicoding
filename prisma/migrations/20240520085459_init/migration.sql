@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE `curriculum_vitaes` MODIFY `status` ENUM('accepted', 'denied', 'queuing') NOT NULL;
+ALTER TABLE `Curriculum_vitaes` MODIFY `status` ENUM('accepted', 'denied', 'queuing') NOT NULL;

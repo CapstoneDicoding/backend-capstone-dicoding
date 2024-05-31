@@ -14,20 +14,20 @@
 
 */
 -- DropIndex
-DROP INDEX `Candidates_username_key` ON `candidates`;
+DROP INDEX `Candidates_username_key` ON `Candidates`;
 
 -- DropIndex
-DROP INDEX `Companies_username_key` ON `companies`;
+DROP INDEX `Companies_username_key` ON `Companies`;
 
 -- AlterTable
-ALTER TABLE `candidates` DROP COLUMN `fullname`,
+ALTER TABLE `Candidates` DROP COLUMN `fullname`,
     DROP COLUMN `password`,
     DROP COLUMN `photo_path`,
     DROP COLUMN `username`,
     ADD COLUMN `user_id` INTEGER NOT NULL;
 
 -- AlterTable
-ALTER TABLE `companies` DROP COLUMN `fullname`,
+ALTER TABLE `Companies` DROP COLUMN `fullname`,
     DROP COLUMN `password`,
     DROP COLUMN `photo_path`,
     DROP COLUMN `username`,
