@@ -6,10 +6,10 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
   NotFoundException,
   UseGuards,
   Query,
-  Request,
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
@@ -26,10 +26,9 @@ export class JobsController {
 
   @Roles(Role.recruiter)
   @Post()
-  async create(@Request() req: any, @Body() data: CreateJobDto) {
-    const { company_id } = req.user;
+  async create(@Request() req, @Body() data: CreateJobDto) {
 
-    await this.jobsService.create(data, company_id);
+    await this.jobsService.create(req.user.id, data);
 
     return {
       message: 'Lowongan pekerjaan berhasil dibuat',

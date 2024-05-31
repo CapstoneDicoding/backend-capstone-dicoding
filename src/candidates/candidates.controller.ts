@@ -23,7 +23,6 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { Role, Roles } from 'src/auth/roles.decorator';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.candidate)
 @Controller('candidates')
 export class CandidatesController {
   constructor(private candidatesService: CandidatesService) {}
