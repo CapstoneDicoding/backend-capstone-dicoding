@@ -87,6 +87,7 @@ export class JobsService {
             user: {
               select: {
                 fullname: true,
+                photo_path: true,
               },
             },
           },
