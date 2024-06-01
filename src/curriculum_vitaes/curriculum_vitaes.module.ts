@@ -4,6 +4,7 @@ import { CurriculumVitaesController } from './curriculum_vitaes.controller';
 import { PrismaService } from 'src/prisma.service';
 
 @Module({
+  exports: [CurriculumVitaesService],
   controllers: [CurriculumVitaesController],
   providers: [CurriculumVitaesService, PrismaService],
 })
