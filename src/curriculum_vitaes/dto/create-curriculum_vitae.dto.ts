@@ -2,10 +2,6 @@ import { IsEnum, IsInt, IsNotEmpty, IsString } from 'class-validator';
 import { cv_status } from '../entities/curriculum_vitae.entity';
 
 export class CreateCurriculumVitaeDto {
-  @IsNotEmpty()
-  @IsString()
-  original_cv_path: string;
-
   @IsInt()
   @IsNotEmpty()
   job_id: number;
