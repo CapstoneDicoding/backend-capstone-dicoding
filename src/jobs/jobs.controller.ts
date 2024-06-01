@@ -34,10 +34,13 @@ export class JobsController {
   async create(@Request() req, @Body() data: CreateJobDto) {
     const { company_id } = req.user;
 
-    await this.jobsService.create(data, company_id);
+    const job = await this.jobsService.create(data, company_id);
 
     return {
       message: 'Lowongan pekerjaan berhasil dibuat',
+      data: {
+        job_id: job.id,
+      },
     };
   }
 
