@@ -43,12 +43,12 @@ export class CurriculumVitaesController {
     try {
       const { candidate_id } = req.user;
       const original_cv_path = await this.gcsService.uploadFile(cv);
-      
+
       // TO BE DEVELOPED
       const summarized_cv_path = 'tes';
       const accuracy = 100;
       const status = cv_status.queuing;
-      
+
       const cvData = {
         original_cv_path,
         job_id: +data.job_id,
@@ -57,7 +57,7 @@ export class CurriculumVitaesController {
         accuracy,
         status,
       };
-      
+
       await this.curriculumVitaesService.create(cvData);
 
       return {
