@@ -19,6 +19,41 @@ export class CurriculumVitaesService {
     return await this.dbService.curriculum_vitaes.findMany();
   }
 
+  async findAllJobCvs({ job_id, page, limit }) {
+    const skip = (page - 1) * limit;
+
+    const totalcvs = await this.dbService.curriculum_vitaes.count({
+      where: { job_id },
+    });
+    const totalPages = Math.ceil(totalcvs / limit);
+
+    const cvs = await this.dbService.curriculum_vitaes.findMany({
+      skip,
+      take: limit,
+      where: { job_id },
+      orderBy: {
+        accuracy: 'desc',
+      },
+      include: {
+        candidate: {
+          select: {
+            user: {
+              select: {
+                fullname: true,
+              },
+            },
+            skills: true,
+          },
+        },
+      }
+    });
+
+    return {
+      cvs,
+      totalPages,
+    };
+  }
+
   async findById(id: number) {
     return await this.dbService.curriculum_vitaes.findUniqueOrThrow({
       where: { id },
