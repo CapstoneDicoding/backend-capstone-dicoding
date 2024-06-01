@@ -10,6 +10,8 @@ import {
   BadRequestException,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { CurriculumVitaesService } from './curriculum_vitaes.service';
 import { CreateCurriculumVitaeDto } from './dto/create-curriculum_vitae.dto';
@@ -19,32 +21,43 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Role, Roles } from 'src/auth/roles.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { GcsService } from 'src/google-cloud.storage/gcs.service';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('cvs')
 export class CurriculumVitaesController {
   constructor(
     private readonly curriculumVitaesService: CurriculumVitaesService,
+    private readonly gcsService: GcsService,
   ) {}
 
   @Roles(Role.candidate)
   @Post()
-  async create(@Request() req: any, @Body() data: CreateCurriculumVitaeDto) {
+  @UseInterceptors(FileInterceptor('cv'))
+  async create(
+    @Request() req: any,
+    @Body() data: CreateCurriculumVitaeDto,
+    @UploadedFile() cv: Express.Multer.File,
+  ) {
     try {
-      // TO BE DEVELOPED
       const { candidate_id } = req.user;
+      const original_cv_path = await this.gcsService.uploadFile(cv);
+      
+      // TO BE DEVELOPED
       const summarized_cv_path = 'tes';
       const accuracy = 100;
       const status = cv_status.queuing;
-
+      
       const cvData = {
-        ...data,
+        original_cv_path,
+        job_id: +data.job_id,
         candidate_id,
         summarized_cv_path,
         accuracy,
         status,
       };
-
+      
       await this.curriculumVitaesService.create(cvData);
 
       return {
