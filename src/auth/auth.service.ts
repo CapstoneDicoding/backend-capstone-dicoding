@@ -48,6 +48,7 @@ export class AuthService {
       id: user.id,
       fullname: user.fullname,
       role: user.role,
+      photo_path: user.photo_path
     };
     
     let extendedPayload = payload as any;
@@ -59,6 +60,6 @@ export class AuthService {
       extendedPayload.candidate_id = id;
     }
 
-    return { access_token: this.jwtService.sign(extendedPayload), role: user.role};
+    return { access_token: this.jwtService.sign(extendedPayload), role: user.role, photo_path: user.photo_path};
   }
 }
