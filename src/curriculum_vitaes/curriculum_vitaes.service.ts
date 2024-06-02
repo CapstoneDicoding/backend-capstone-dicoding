@@ -45,7 +45,7 @@ export class CurriculumVitaesService {
             skills: true,
           },
         },
-      }
+      },
     });
 
     return {
@@ -63,6 +63,7 @@ export class CurriculumVitaesService {
             user: {
               select: {
                 fullname: true,
+                photo_path: true,
               },
             },
             email: true,
