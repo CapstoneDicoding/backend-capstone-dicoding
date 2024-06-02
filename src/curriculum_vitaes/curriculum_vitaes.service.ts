@@ -40,6 +40,7 @@ export class CurriculumVitaesService {
             user: {
               select: {
                 fullname: true,
+                photo_path: true,
               },
             },
             skills: true,
