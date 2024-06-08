@@ -8,5 +8,6 @@ import { CurriculumVitaesModule } from 'src/curriculum_vitaes/curriculum_vitaes.
   imports: [CurriculumVitaesModule],
   controllers: [JobsController],
   providers: [JobsService, PrismaService],
+  exports: [JobsService],
 })
 export class JobsModule {}
