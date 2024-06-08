@@ -6,7 +6,7 @@ import { GCSModule } from 'src/google-cloud.storage/gcs.module';
 import { JobsModule } from 'src/jobs/jobs.module';
 
 @Module({
-  imports: [GCSModule, forwardRef(() => JobsModule)],
+  imports: [GCSModule, JobsModule],
   exports: [CurriculumVitaesService],
   controllers: [CurriculumVitaesController],
   providers: [CurriculumVitaesService, PrismaService],

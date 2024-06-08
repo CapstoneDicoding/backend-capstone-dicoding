@@ -57,10 +57,9 @@ export class CurriculumVitaesController {
         accuracy: 0,
         status: cv_status.queuing,
       };
+
+      // Fetch summarized CV path from cloud function
       const createdCv = await this.curriculumVitaesService.create(cvData);
-
-      created_cv_id = createdCv.id
-
       const summarizedCvResponse = await Axios.post(
         'https://asia-southeast2-dicoding-jobs-capstone.cloudfunctions.net/cv-summarization-function1',
         {
@@ -68,48 +67,38 @@ export class CurriculumVitaesController {
           cv_id: createdCv.id,
         },
       );
+
       const summarized_cv_path = summarizedCvResponse.data.summarized_cv_path;
       const summarized_cv_json = summarizedCvResponse.data.candidate_cv_data;
-
-      const cvSummarizedCvDataUpdate = {
-        summarized_cv_path,
-        summarized_cv_json,
-      };
-      await this.curriculumVitaesService.update(createdCv.id, cvSummarizedCvDataUpdate);
 
       const allCv = await this.curriculumVitaesService.findAllJobCvs({
         job_id: createdCv.job_id,
         page: 1,
         limit: 100,
       });
-      const allCv_json = allCv.cvs.map((cvItem) => cvItem.summarized_cv_json);
 
       const job = await this.jobsService.findById(createdCv.job_id);
 
       const candidateRecommendationResponse = await Axios.post(
         'https://asia-southeast2-dicoding-jobs-capstone.cloudfunctions.net/recomm-function',
         {
-          job_requirements: job.requirements,
-          cvs: allCv_json,
+          requirements: job.requirements,
         },
       );
+      const accuracy = candidateRecommendationResponse.data.accuracy;
+      const status = cv_status.queuing;
 
-      const accuracy = candidateRecommendationResponse.data.find(item => item[0] === createdCv.id)[2] * 100;
-
-      const cvAccuracyDataUpdate = {
-        accuracy: +accuracy.toFixed(2),
+      const cvDataUpdate = {
+        summarized_cv_path,
+        accuracy,
       };
 
-      await this.curriculumVitaesService.update(createdCv.id, cvAccuracyDataUpdate);
+      await this.curriculumVitaesService.update(createdCv.id, cvDataUpdate);
 
       return {
         message: 'CV berhasil ditambah',
       };
     } catch (error) {
-      if (created_cv_id) {
-        await this.curriculumVitaesService.delete(+created_cv_id);
-      }
-      console.log(error)
       if (error.response && error.response.status === 400) {
         throw new BadRequestException('Invalid job_id');
       }

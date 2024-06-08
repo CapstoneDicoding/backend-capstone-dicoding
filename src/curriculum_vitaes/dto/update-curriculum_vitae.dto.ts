@@ -11,10 +11,6 @@ export class UpdateCurriculumVitaeDto {
   summarized_cv_path?: string;
 
   @IsOptional()
-  @IsString()
-  summarized_cv_json?: string;
-
-  @IsOptional()
   @IsDecimal()
   accuracy?: number;
 
