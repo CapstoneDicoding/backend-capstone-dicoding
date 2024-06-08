@@ -23,6 +23,8 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { Role, Roles } from 'src/auth/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GcsService } from 'src/google-cloud.storage/gcs.service';
+import Axios from 'axios';
+import { JobsService } from 'src/jobs/jobs.service';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('cvs')
@@ -30,6 +32,7 @@ export class CurriculumVitaesController {
   constructor(
     private readonly curriculumVitaesService: CurriculumVitaesService,
     private readonly gcsService: GcsService,
+    private readonly jobsService: JobsService,
   ) {}
 
   @Roles(Role.candidate)
@@ -44,31 +47,60 @@ export class CurriculumVitaesController {
       const { candidate_id } = req.user;
       const original_cv_path = await this.gcsService.uploadFile(cv);
 
-      // TO BE DEVELOPED
-      const summarized_cv_path = 'tes';
-      const accuracy = 100;
-      const status = cv_status.queuing;
-
       const cvData = {
         original_cv_path,
         job_id: +data.job_id,
         candidate_id,
-        summarized_cv_path,
-        accuracy,
-        status,
+        summarized_cv_path: '',
+        accuracy: 0,
+        status: cv_status.queuing,
       };
 
-      await this.curriculumVitaesService.create(cvData);
+      // Fetch summarized CV path from cloud function
+      const createdCv = await this.curriculumVitaesService.create(cvData);
+      const summarizedCvResponse = await Axios.post(
+        'https://asia-southeast2-dicoding-jobs-capstone.cloudfunctions.net/cv-summarization-function1',
+        {
+          original_cv_path,
+          cv_id: createdCv.id,
+        },
+      );
+
+      const summarized_cv_path = summarizedCvResponse.data.summarized_cv_path;
+      const summarized_cv_json = summarizedCvResponse.data.candidate_cv_data;
+
+      const allCv = await this.curriculumVitaesService.findAllJobCvs({
+        job_id: createdCv.job_id,
+        page: 1,
+        limit: 100,
+      });
+
+      const job = await this.jobsService.findById(createdCv.job_id);
+
+      const candidateRecommendationResponse = await Axios.post(
+        'https://asia-southeast2-dicoding-jobs-capstone.cloudfunctions.net/recomm-function',
+        {
+          requirements: job.requirements,
+        },
+      );
+      const accuracy = candidateRecommendationResponse.data.accuracy;
+      const status = cv_status.queuing;
+
+      const cvDataUpdate = {
+        summarized_cv_path,
+        accuracy,
+      };
+
+      await this.curriculumVitaesService.update(createdCv.id, cvDataUpdate);
 
       return {
         message: 'CV berhasil ditambah',
       };
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2003') {
-          throw new BadRequestException('Invalid job_id');
-        }
+      if (error.response && error.response.status === 400) {
+        throw new BadRequestException('Invalid job_id');
       }
+      throw new Error('Failed to create CV');
     }
   }
 
