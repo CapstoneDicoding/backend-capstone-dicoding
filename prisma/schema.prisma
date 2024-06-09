@@ -72,8 +72,9 @@ model Curriculum_vitaes {
   id                 Int        @id @default(autoincrement())
   original_cv_path   String
   summarized_cv_path String?
-  accuracy           Int?
+  accuracy           Float?
   status             CV_status
+  summarized_cv_json Json?
   candidate          Candidates @relation(fields: [candidate_id], references: [id])
   candidate_id       Int
   job                Jobs       @relation(fields: [job_id], references: [id])
