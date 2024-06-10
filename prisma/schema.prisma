@@ -35,7 +35,7 @@ model Users {
 model Candidates {
   id                Int                 @id @default(autoincrement())
   user_id           Int
-  user              Users               @relation(fields: [user_id], references: [id])
+  user              Users               @relation(fields: [user_id], references: [id], onDelete: Cascade)
   email             String
   notelp            String
   skills            Json
@@ -47,7 +47,7 @@ model Candidates {
 model Companies {
   id          Int       @id @default(autoincrement())
   user_id     Int
-  user        Users     @relation(fields: [user_id], references: [id])
+  user        Users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   location    String
   description String
   createdAt   DateTime  @default(now())
@@ -61,7 +61,7 @@ model Jobs {
   business_sector   String
   requirements      String
   candidate_needed  Int
-  company           Companies           @relation(fields: [company_id], references: [id])
+  company           Companies           @relation(fields: [company_id], references: [id], onDelete: Cascade)
   company_id        Int
   createdAt         DateTime            @default(now())
   updatedAt         DateTime?           @updatedAt
@@ -75,9 +75,9 @@ model Curriculum_vitaes {
   accuracy           Float?
   status             CV_status
   summarized_cv_json Json?
-  candidate          Candidates @relation(fields: [candidate_id], references: [id])
+  candidate          Candidates @relation(fields: [candidate_id], references: [id], onDelete: Cascade)
   candidate_id       Int
-  job                Jobs       @relation(fields: [job_id], references: [id])
+  job                Jobs       @relation(fields: [job_id], references: [id], onDelete: Cascade)
   job_id             Int
   createdAt          DateTime   @default(now())
   updatedAt          DateTime?  @updatedAt
