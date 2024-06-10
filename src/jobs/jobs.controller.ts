@@ -171,8 +171,17 @@ export class JobsController {
 
   @Roles(Role.recruiter)
   @Delete(':id')
-  async deleteById(@Param('id') id: string) {
+    async deleteById(@Request() req: any, @Param('id') id: string) {
     try {
+      const { company_id } = req.user;
+      const job = await this.jobsService.findById(+id);
+
+      if (company_id !== job.company_id) {
+        throw new ForbiddenException(
+          'Anda tidak mempunyai akses ke resource ini!',
+        );
+      }
+
       await this.jobsService.delete(+id);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
