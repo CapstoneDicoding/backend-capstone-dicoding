@@ -59,10 +59,10 @@ export class CurriculumVitaesController {
       };
       const createdCv = await this.curriculumVitaesService.create(cvData);
 
-      created_cv_id = createdCv.id
+      created_cv_id = createdCv.id;
 
       const summarizedCvResponse = await Axios.post(
-        'https://asia-southeast2-dicoding-jobs-capstone.cloudfunctions.net/cv-summarization-function1',
+        'https://cv-summarization-api-ry2qx4pc7a-et.a.run.app/',
         {
           original_cv_path,
           cv_id: createdCv.id,
@@ -76,7 +76,10 @@ export class CurriculumVitaesController {
         summarized_cv_path,
         summarized_cv_json,
       };
-      await this.curriculumVitaesService.update(createdCv.id, cvSummarizedCvDataUpdate);
+      await this.curriculumVitaesService.update(
+        createdCv.id,
+        cvSummarizedCvDataUpdate,
+      );
 
       const allCv = await this.curriculumVitaesService.findAllJobCvs({
         job_id: createdCv.job_id,
@@ -97,14 +100,20 @@ export class CurriculumVitaesController {
 
       console.log(candidateRecommendationResponse.data);
 
-      const accuracy = candidateRecommendationResponse.data.find(item => item[0] === createdCv.id)[2] * 100;
-      console.log(+accuracy.toFixed(2))
+      const accuracy =
+        candidateRecommendationResponse.data.find(
+          (item) => item[0] === createdCv.id,
+        )[2] * 100;
+      console.log(+accuracy.toFixed(2));
 
       const cvAccuracyDataUpdate = {
         accuracy: +accuracy.toFixed(2),
       };
 
-      await this.curriculumVitaesService.update(createdCv.id, cvAccuracyDataUpdate);
+      await this.curriculumVitaesService.update(
+        createdCv.id,
+        cvAccuracyDataUpdate,
+      );
 
       return {
         message: 'CV berhasil ditambah',
@@ -113,7 +122,7 @@ export class CurriculumVitaesController {
       if (created_cv_id) {
         await this.curriculumVitaesService.delete(+created_cv_id);
       }
-      console.log(error)
+      console.log(error);
       if (error.response && error.response.status === 400) {
         throw new BadRequestException('Invalid job_id');
       }
