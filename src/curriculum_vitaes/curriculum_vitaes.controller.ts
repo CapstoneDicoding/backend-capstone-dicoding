@@ -70,7 +70,6 @@ export class CurriculumVitaesController {
       );
       const summarized_cv_path = summarizedCvResponse.data.summarized_cv_path;
       const summarized_cv_json = summarizedCvResponse.data.candidate_cv_data;
-      // console.log(summarized_cv_json.skills.join(", "))
 
       const cvSummarizedCvDataUpdate = {
         summarized_cv_path,
@@ -98,16 +97,14 @@ export class CurriculumVitaesController {
         },
       );
 
-      console.log(candidateRecommendationResponse.data);
-
-      const accuracy =
-        candidateRecommendationResponse.data.find(
-          (item) => item[0] === createdCv.id,
-        )[2] * 100;
-      console.log(+accuracy.toFixed(2));
+      const result =
+        candidateRecommendationResponse.data.recommendations.find(
+          (item) => {
+            return +item.cv_id === createdCv.id},
+        );
 
       const cvAccuracyDataUpdate = {
-        accuracy: +accuracy.toFixed(2),
+        accuracy: +parseFloat(result.similarity_score).toFixed(2),
       };
 
       await this.curriculumVitaesService.update(
@@ -122,7 +119,6 @@ export class CurriculumVitaesController {
       if (created_cv_id) {
         await this.curriculumVitaesService.delete(+created_cv_id);
       }
-      console.log(error);
       if (error.response && error.response.status === 400) {
         throw new BadRequestException('Invalid job_id');
       }
