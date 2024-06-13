@@ -104,7 +104,7 @@ export class CurriculumVitaesController {
         );
 
       const cvAccuracyDataUpdate = {
-        accuracy: +parseFloat(result.similarity_score).toFixed(2),
+        accuracy: +parseFloat(result.similarity_score).toFixed(1),
       };
 
       await this.curriculumVitaesService.update(
