@@ -90,7 +90,7 @@ export class CurriculumVitaesController {
       const job = await this.jobsService.findById(createdCv.job_id);
 
       const candidateRecommendationResponse = await Axios.post(
-        'https://asia-southeast2-dicoding-jobs-capstone.cloudfunctions.net/recomm-function',
+        'https://scoring-api-ry2qx4pc7a-et.a.run.app',
         {
           job_requirements: job.requirements,
           cvs: allCv_json,
