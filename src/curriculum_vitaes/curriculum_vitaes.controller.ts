@@ -97,11 +97,7 @@ export class CurriculumVitaesController {
         },
       );
 
-      const result =
-        candidateRecommendationResponse.data.recommendations.find(
-          (item) => {
-            return +item.cv_id === createdCv.id},
-        );
+      const accuracy = candidateRecommendationResponse.data.find(item => item[0] === createdCv.id)[2] * 100;
 
       const cvAccuracyDataUpdate = {
         accuracy: +parseFloat(result.similarity_score).toFixed(1),
