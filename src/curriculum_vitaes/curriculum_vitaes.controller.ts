@@ -71,45 +71,31 @@ export class CurriculumVitaesController {
       const summarized_cv_path = summarizedCvResponse.data.summarized_cv_path;
       const summarized_cv_json = summarizedCvResponse.data.candidate_cv_data;
 
-      const cvSummarizedCvDataUpdate = {
-        summarized_cv_path,
-        summarized_cv_json,
-      };
-      await this.curriculumVitaesService.update(
-        createdCv.id,
-        cvSummarizedCvDataUpdate,
-      );
-
-      const allCv = await this.curriculumVitaesService.findAllJobCvs({
-        job_id: createdCv.job_id,
-        page: 1,
-        limit: 100,
-      });
-      const allCv_json = allCv.cvs.map((cvItem) => cvItem.summarized_cv_json);
-
       const job = await this.jobsService.findById(createdCv.job_id);
 
       const candidateRecommendationResponse = await Axios.post(
         'https://scoring-api-ry2qx4pc7a-et.a.run.app',
         {
           job_requirements: job.requirements,
-          cvs: allCv_json,
+          cvs: [summarized_cv_json],
         },
       );
 
       const result =
-        candidateRecommendationResponse.data.recommendations.find(
+        candidateRecommendationResponse.data.find(
           (item) => {
             return +item.cv_id === createdCv.id},
         );
 
-      const cvAccuracyDataUpdate = {
-        accuracy: +parseFloat(result.similarity_score).toFixed(1),
+      const cvDataUpdate = {
+        accuracy: +parseFloat(result.similarity).toFixed(1),
+        summarized_cv_path,
+        summarized_cv_json,
       };
 
       await this.curriculumVitaesService.update(
         createdCv.id,
-        cvAccuracyDataUpdate,
+        cvDataUpdate,
       );
 
       return {
