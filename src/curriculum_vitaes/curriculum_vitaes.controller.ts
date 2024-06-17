@@ -70,7 +70,6 @@ export class CurriculumVitaesController {
       );
       const summarized_cv_path = summarizedCvResponse.data.summarized_cv_path;
       const summarized_cv_json = summarizedCvResponse.data.candidate_cv_data;
-      // console.log(summarized_cv_json.skills.join(", "))
 
       const cvSummarizedCvDataUpdate = {
         summarized_cv_path,
@@ -95,10 +94,7 @@ export class CurriculumVitaesController {
         },
       );
 
-      console.log(candidateRecommendationResponse.data);
-
       const accuracy = candidateRecommendationResponse.data.find(item => item[0] === createdCv.id)[2] * 100;
-      console.log(+accuracy.toFixed(2))
 
       const cvAccuracyDataUpdate = {
         accuracy: +accuracy.toFixed(2),
